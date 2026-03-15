@@ -105,7 +105,7 @@ function handleCreateRoom(ws, message) {
       id: playerId,
       name: message.playerName,
       ws: ws,
-      isMaster: false
+      isMaster: true
     }],
     gameState: 'lobby',
     currentPhase: null,
