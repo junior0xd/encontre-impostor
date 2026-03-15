@@ -37,7 +37,7 @@ function sendToPlayer(roomCode, playerId, message) {
   }
 }
 
-wss.on('***', (ws) => {
+wss.on('connection', (ws) => {
   console.log('Nova conexão WebSocket estabelecida');
   
   ws.on('message', (data) => {
