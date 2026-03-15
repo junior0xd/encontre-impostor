@@ -408,6 +408,32 @@ function showError(message) {
 function resetToLobby() {
   state.currentPhase = null;
   state.isImpostor = false;
+  
+    // Resetar fases do mestre
+  document.getElementById('master-phase1').classList.remove('hidden');
+  document.getElementById('master-phase2').classList.add('hidden');
+  document.getElementById('master-phase3').classList.add('hidden');
+  document.getElementById('master-waiting').classList.add('hidden');
+  document.getElementById('send-questions-btn').classList.remove('hidden');
+  document.getElementById('reveal-answers-btn').classList.add('hidden');
+  document.getElementById('answers-status').innerHTML = '';
+  document.getElementById('private-questions-list').innerHTML = '';
+  document.getElementById('private-questions-box').classList.add('hidden');
+  document.getElementById('question-a').value = '';
+  document.getElementById('question-b').value = '';
+  document.getElementById('impostor-select').value = '';
+
+  // Resetar fases do jogador
+  document.getElementById('player-phase1').classList.remove('hidden');
+  document.getElementById('player-phase2').classList.add('hidden');
+  document.getElementById('player-phase3').classList.add('hidden');
+  document.getElementById('submit-answer-btn').classList.remove('hidden');
+  document.getElementById('answer-submitted').classList.add('hidden');
+  document.getElementById('player-answer').value = '';
+  document.getElementById('private-answer-box').classList.add('hidden');
+  document.getElementById('vote-submitted').classList.add('hidden');
+  document.getElementById('voting-list').classList.remove('hidden');
+  
   showLobby();
 }
 
