@@ -154,7 +154,7 @@ function handleJoinRoom(ws, message) {
     id: playerId,
     name: message.playerName,
     ws: ws,
-    isMaster: true
+    isMaster: false
   });
   
   ws.roomCode = message.roomCode;
