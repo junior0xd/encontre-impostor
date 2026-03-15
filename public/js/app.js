@@ -6,6 +6,8 @@ const state = {
   roomCode: null,
   isMaster: false,
   isImpostor: false,
+  myQuestion: null,      // pergunta recebida pelo jogador
+  questionA: null,       // pergunta dos jogadores normais (só o mestre sabe)
   players: [],
   currentPhase: null
 };
@@ -88,7 +90,7 @@ function handleMessage(message) {
       break;
 
     case 'answersRevealed':
-      displayAllAnswers(message.answers);
+      displayAllAnswers(message.answers, message.questionA, message.questionB);
       break;
 
     case 'votingStarted':
@@ -235,8 +237,14 @@ function updateGamePhaseDisplay() {
     document.getElementById('player-interface').classList.add('hidden');
     populateImpostorSelect();
   } else {
-    roleBadge.textContent = state.isImpostor ? '🎭 Impostor' : '🕵️ Jogador';
-    roleBadge.className = state.isImpostor ? 'badge badge-impostor' : 'badge badge-player';
+    // FIX: Na fase 1, não revelar o papel. Só revelar na fase 2 em diante.
+    if (state.currentPhase >= 2) {
+      roleBadge.textContent = state.isImpostor ? '🎭 Impostor' : '🕵️ Jogador';
+      roleBadge.className = state.isImpostor ? 'badge badge-impostor' : 'badge badge-player';
+    } else {
+      roleBadge.textContent = '🕵️ Jogador';
+      roleBadge.className = 'badge badge-player';
+    }
     document.getElementById('player-interface').classList.remove('hidden');
     document.getElementById('master-interface').classList.add('hidden');
   }
@@ -257,8 +265,9 @@ function populateImpostorSelect() {
 // Fase 1: Perguntas
 function displayQuestion(question, isImpostor) {
   state.isImpostor = isImpostor;
+  state.myQuestion = question; // salvar pergunta para usar na fase 2
   document.getElementById('player-question').textContent = question;
-  updateGamePhaseDisplay();
+  // FIX: não chamar updateGamePhaseDisplay aqui para não revelar o papel na fase 1
 }
 
 function showMasterWaiting() {
@@ -322,10 +331,11 @@ function showDiscussionPhase() {
     document.getElementById('player-phase1').classList.add('hidden');
     document.getElementById('player-phase2').classList.remove('hidden');
   }
+  // Agora sim revela o papel
   updateGamePhaseDisplay();
 }
 
-function displayAllAnswers(answers) {
+function displayAllAnswers(answers, questionA, questionB) {
   const masterList = document.getElementById('revealed-answers-list');
   const playerList = document.getElementById('player-answers-list');
   
@@ -340,6 +350,45 @@ function displayAllAnswers(answers) {
     masterList.appendChild(answerDiv.cloneNode(true));
     playerList.appendChild(answerDiv);
   });
+
+  // FIX: mostrar a pergunta do jogador na fase de discussão
+  if (!state.isMaster && state.myQuestion) {
+    const playerPhase2 = document.getElementById('player-phase2');
+
+    // Remover bloco anterior se existir (nova rodada)
+    const existingBlock = playerPhase2.querySelector('.my-question-reminder');
+    if (existingBlock) existingBlock.remove();
+
+    if (state.isImpostor) {
+      // Impostor: destaque especial mostrando ambas as perguntas
+      const impostorBlock = document.createElement('div');
+      impostorBlock.className = 'my-question-reminder impostor-reminder';
+      impostorBlock.innerHTML = `
+        <div class="impostor-alert">🎭 Você é o <strong>IMPOSTOR!</strong></div>
+        <div class="impostor-questions">
+          <div class="question-row impostor-q">
+            <span class="q-label">Sua pergunta (impostor):</span>
+            <span class="q-text">${state.myQuestion}</span>
+          </div>
+          <div class="question-row normal-q">
+            <span class="q-label">Pergunta dos outros jogadores:</span>
+            <span class="q-text">${questionA || '—'}</span>
+          </div>
+        </div>
+        <p class="impostor-tip">⚠️ Cuidado para não se trair! Suas respostas devem parecer relacionadas à pergunta dos outros.</p>
+      `;
+      playerPhase2.insertBefore(impostorBlock, playerPhase2.firstChild);
+    } else {
+      // Jogador normal: lembrete simples da pergunta
+      const reminderBlock = document.createElement('div');
+      reminderBlock.className = 'my-question-reminder normal-reminder';
+      reminderBlock.innerHTML = `
+        <span class="q-label">Sua pergunta era:</span>
+        <span class="q-text">${state.myQuestion}</span>
+      `;
+      playerPhase2.insertBefore(reminderBlock, playerPhase2.firstChild);
+    }
+  }
 
   if (state.isMaster) {
     send({ type: 'startDiscussion' });
@@ -408,8 +457,9 @@ function showError(message) {
 function resetToLobby() {
   state.currentPhase = null;
   state.isImpostor = false;
-  
-    // Resetar fases do mestre
+  state.myQuestion = null;  // FIX: limpar pergunta salva
+
+  // Resetar fases do mestre
   document.getElementById('master-phase1').classList.remove('hidden');
   document.getElementById('master-phase2').classList.add('hidden');
   document.getElementById('master-phase3').classList.add('hidden');
@@ -429,11 +479,20 @@ function resetToLobby() {
   document.getElementById('player-phase3').classList.add('hidden');
   document.getElementById('submit-answer-btn').classList.remove('hidden');
   document.getElementById('answer-submitted').classList.add('hidden');
+  // FIX: limpar pergunta exibida na fase 1
+  document.getElementById('player-question').textContent = '';
   document.getElementById('player-answer').value = '';
   document.getElementById('private-answer-box').classList.add('hidden');
+  document.getElementById('private-question-input').value = '';
   document.getElementById('vote-submitted').classList.add('hidden');
   document.getElementById('voting-list').classList.remove('hidden');
-  
+
+  // FIX: limpar listas de respostas e blocos de lembrete de pergunta
+  document.getElementById('player-answers-list').innerHTML = '';
+  document.getElementById('revealed-answers-list').innerHTML = '';
+  const reminder = document.querySelector('.my-question-reminder');
+  if (reminder) reminder.remove();
+
   showLobby();
 }
 

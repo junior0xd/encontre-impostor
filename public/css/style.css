@@ -386,6 +386,120 @@ body {
     }
 }
 
+/* ── Lembretes de pergunta na fase de discussão ── */
+
+/* Jogador normal: faixa discreta azul */
+.normal-reminder {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: #f0f4ff;
+    border-left: 4px solid #667eea;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.4s;
+}
+
+.normal-reminder .q-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #667eea;
+}
+
+.normal-reminder .q-text {
+    font-size: 1rem;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Impostor: bloco vermelho chamativo */
+.impostor-reminder {
+    background: #fff0f0;
+    border: 2px solid #e74c3c;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.4s;
+}
+
+.impostor-alert {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #c0392b;
+    background: #fde8e8;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+}
+
+.impostor-questions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.question-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.question-row .q-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.question-row .q-text {
+    font-size: 0.97rem;
+    font-weight: 500;
+}
+
+/* Pergunta do impostor (vermelha) */
+.impostor-q {
+    background: #fde8e8;
+    border-left: 4px solid #e74c3c;
+}
+
+.impostor-q .q-label {
+    color: #c0392b;
+}
+
+.impostor-q .q-text {
+    color: #7b1a1a;
+}
+
+/* Pergunta dos jogadores normais (azul) */
+.normal-q {
+    background: #f0f4ff;
+    border-left: 4px solid #667eea;
+}
+
+.normal-q .q-label {
+    color: #4a5fb5;
+}
+
+.normal-q .q-text {
+    color: #222;
+}
+
+.impostor-tip {
+    margin-top: 12px;
+    background: #fff3cd;
+    border-left: 4px solid #f39c12;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #856404;
+    font-size: 0.88rem;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
     .container {

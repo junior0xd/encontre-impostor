@@ -304,9 +304,12 @@ function handleRevealAnswers(ws, message) {
     }
   });
   
+  // FIX: enviar questionA e questionB junto com as respostas
   broadcastToRoom(ws.roomCode, {
     type: 'answersRevealed',
-    answers: answersArray
+    answers: answersArray,
+    questionA: room.questionA,
+    questionB: room.questionB
   });
 }
 
