@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encontre o Impostor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Tela inicial -->
+        <div id="home-screen" class="screen active">
+            <div class="container">
+                <h1 class="title">🕵️ Encontre o Impostor</h1>
+                <p class="subtitle">Jogue com seus amigos em tempo real</p>
+                
+                <div class="input-group">
+                    <input type="text" id="player-name" placeholder="Seu nome" maxlength="20">
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="create-room-btn">Criar Sala</button>
+                    <button class="btn btn-secondary" id="join-room-btn">Entrar em Sala</button>
+                </div>
+                
+                <div id="join-room-input" class="hidden">
+                    <div class="input-group">
+                        <input type="text" id="room-code-input" placeholder="Código da sala" maxlength="6">
+                    </div>
+                    <button class="btn btn-primary" id="confirm-join-btn">Entrar</button>
+                    <button class="btn btn-secondary" id="cancel-join-btn">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela do Lobby -->
+        <div id="lobby-screen" class="screen">
+            <div class="container">
+                <h2 class="title">Sala: <span id="lobby-room-code"></span></h2>
+                <p class="subtitle">Aguardando jogadores...</p>
+                
+                <div class="players-list" id="lobby-players-list">
+                    <!-- Jogadores aparecerão aqui -->
+                </div>
+                
+                <div class="info-box">
+                    <p><strong>Regras:</strong></p>
+                    <ul>
+                        <li>5 jogadores necessários (1 mestre + 4 jogadores)</li>
+                        <li>O mestre define as perguntas e escolhe o impostor</li>
+                        <li>Jogadores devem descobrir quem é o impostor</li>
+                    </ul>
+                </div>
+                
+                <div class="button-group" id="lobby-buttons">
+                    <button class="btn btn-primary" id="start-game-btn" disabled>Iniciar Jogo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela do Jogo -->
+        <div id="game-screen" class="screen">
+            <div class="container">
+                <div class="game-header">
+                    <h3 id="game-phase-title">Fase 1: Perguntas</h3>
+                    <span id="game-role-badge" class="badge"></span>
+                </div>
+
+                <!-- Interface do Mestre -->
+                <div id="master-interface" class="game-interface hidden">
+                    <div class="phase-content">
+                        <!-- Fase 1: Criar perguntas -->
+                        <div id="master-phase1" class="phase-section">
+                            <h4>Defina as perguntas:</h4>
+                            <div class="input-group">
+                                <label>Pergunta A (para 3 jogadores):</label>
+                                <textarea id="question-a" rows="2" placeholder="Digite a pergunta A..."></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label>Pergunta B (para o impostor):</label>
+                                <textarea id="question-b" rows="2" placeholder="Digite a pergunta B..."></textarea>
+                            </div>
+                            <div class="input-group">
+                                <label>Escolha o impostor:</label>
+                                <select id="impostor-select">
+                                    <option value="">Selecione...</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" id="send-questions-btn">Enviar Perguntas</button>
+                            
+                            <div id="master-waiting" class="hidden">
+                                <p>✅ Perguntas enviadas! Aguardando respostas...</p>
+                                <div id="answers-status"></div>
+                                <button class="btn btn-primary" id="reveal-answers-btn">Revelar Respostas</button>
+                            </div>
+                            
+                            <div id="private-questions-box" class="info-box hidden">
+                                <h5>Dúvidas dos jogadores:</h5>
+                                <div id="private-questions-list"></div>
+                            </div>
+                        </div>
+
+                        <!-- Fase 2: Discussão -->
+                        <div id="master-phase2" class="phase-section hidden">
+                            <h4>Fase de Discussão</h4>
+                            <div id="revealed-answers-list" class="answers-list"></div>
+                            <p>Os jogadores estão discutindo as respostas...</p>
+                            <button class="btn btn-primary" id="start-voting-btn">Iniciar Votação</button>
+                        </div>
+
+                        <!-- Fase 3: Votação -->
+                        <div id="master-phase3" class="phase-section hidden">
+                            <h4>Fase de Votação</h4>
+                            <p>Aguardando votos dos jogadores...</p>
+                            <div id="voting-status"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interface do Jogador -->
+                <div id="player-interface" class="game-interface hidden">
+                    <div class="phase-content">
+                        <!-- Fase 1: Responder pergunta -->
+                        <div id="player-phase1" class="phase-section">
+                            <div class="question-box" id="player-question-box">
+                                <h4>Sua pergunta:</h4>
+                                <p id="player-question"></p>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label>Sua resposta (seja breve e objetivo):</label>
+                                <textarea id="player-answer" rows="2" placeholder="Digite sua resposta..."></textarea>
+                            </div>
+                            <button class="btn btn-primary" id="submit-answer-btn">Enviar Resposta</button>
+                            
+                            <div id="answer-submitted" class="hidden">
+                                <p>✅ Resposta enviada! Aguardando outros jogadores...</p>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label>Dúvida para o mestre (opcional):</label>
+                                <input type="text" id="private-question-input" placeholder="Digite sua dúvida...">
+                                <button class="btn btn-secondary btn-sm" id="send-private-question-btn">Enviar Dúvida</button>
+                            </div>
+                            
+                            <div id="private-answer-box" class="info-box hidden">
+                                <strong>Resposta do mestre:</strong>
+                                <p id="private-answer-text"></p>
+                            </div>
+                        </div>
+
+                        <!-- Fase 2: Discussão -->
+                        <div id="player-phase2" class="phase-section hidden">
+                            <h4>Respostas reveladas:</h4>
+                            <div id="player-answers-list" class="answers-list"></div>
+                            <p class="warning">⚠️ Discuta as respostas, mas não revele sua pergunta!</p>
+                        </div>
+
+                        <!-- Fase 3: Votação -->
+                        <div id="player-phase3" class="phase-section hidden">
+                            <h4>Vote em quem você acha que é o impostor:</h4>
+                            <div id="voting-list" class="voting-list"></div>
+                            <div id="vote-submitted" class="hidden">
+                                <p>✅ Voto enviado! Aguardando resultado...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tela de Resultado -->
+        <div id="result-screen" class="screen">
+            <div class="container">
+                <h2 class="title" id="result-title"></h2>
+                
+                <div class="result-box">
+                    <h3 id="result-impostor"></h3>
+                    
+                    <h4>Votação:</h4>
+                    <div id="votes-list"></div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" id="new-round-btn">Nova Rodada</button>
+                    <button class="btn btn-secondary" id="leave-room-btn">Sair da Sala</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensagem de erro -->
+        <div id="error-message" class="error-message hidden"></div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
