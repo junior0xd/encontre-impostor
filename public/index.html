@@ -103,6 +103,8 @@
                         <!-- Fase 2: Discussão -->
                         <div id="master-phase2" class="phase-section hidden">
                             <h4>Fase de Discussão</h4>
+                            <!-- FIX: bloco de lembrete das perguntas para o mestre -->
+                            <div id="master-questions-reminder" class="master-questions-reminder hidden"></div>
                             <div id="revealed-answers-list" class="answers-list"></div>
                             <p>Os jogadores estão discutindo as respostas...</p>
                             <button class="btn btn-primary" id="start-voting-btn">Iniciar Votação</button>
@@ -176,6 +178,12 @@
                 
                 <div class="result-box">
                     <h3 id="result-impostor"></h3>
+
+                    <!-- FIX: seção de perguntas reveladas no resultado -->
+                    <div id="result-questions" class="result-questions hidden">
+                        <h4>As perguntas da rodada:</h4>
+                        <div id="result-questions-content"></div>
+                    </div>
                     
                     <h4>Votação:</h4>
                     <div id="votes-list"></div>

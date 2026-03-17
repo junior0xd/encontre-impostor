@@ -304,7 +304,6 @@ function handleRevealAnswers(ws, message) {
     }
   });
   
-  // FIX: enviar questionA e questionB junto com as respostas
   broadcastToRoom(ws.roomCode, {
     type: 'answersRevealed',
     answers: answersArray,
@@ -387,7 +386,10 @@ function calculateResults(roomCode) {
     impostor: impostorPlayer.name,
     impostorId: room.impostor,
     votes: votesArray,
-    mostVoted: mostVotedPlayers.map(id => room.players.find(p => p.id === id).name)
+    mostVoted: mostVotedPlayers.map(id => room.players.find(p => p.id === id).name),
+    // FIX: incluir as perguntas no resultado para todos verem
+    questionA: room.questionA,
+    questionB: room.questionB
   });
   
   room.gameState = 'ended';
