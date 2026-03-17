@@ -7,7 +7,8 @@ const state = {
   isMaster: false,
   isImpostor: false,
   myQuestion: null,      // pergunta recebida pelo jogador
-  questionA: null,       // pergunta dos jogadores normais (só o mestre sabe)
+  questionA: null,       // pergunta dos jogadores normais
+  questionB: null,       // pergunta do impostor
   players: [],
   currentPhase: null
 };
@@ -142,29 +143,22 @@ function showResults(resultData) {
 
   document.getElementById('result-impostor').textContent = `O impostor era: ${resultData.impostor}`;
 
-  // FIX: revelar as perguntas de ambos os grupos
-  const resultBox = document.querySelector('.result-box');
-
-  const existingQBox = document.getElementById('result-questions-box');
-  if (existingQBox) existingQBox.remove();
-
-  const questionsBox = document.createElement('div');
-  questionsBox.id = 'result-questions-box';
-  questionsBox.className = 'info-box';
-  questionsBox.style.marginTop = '16px';
-  questionsBox.style.textAlign = 'left';
-  questionsBox.innerHTML = `
-    <h5>📋 Perguntas da rodada</h5>
-    <p style="margin-bottom:8px;">
-      <strong>Pergunta dos jogadores (A):</strong><br>${resultData.questionA || '—'}
-    </p>
-    <p>
-      <strong>Pergunta do impostor (B):</strong><br>${resultData.questionB || '—'}
-    </p>
-  `;
-
-  const h4Votes = resultBox.querySelector('h4');
-  resultBox.insertBefore(questionsBox, h4Votes);
+  // FIX: exibir as perguntas da rodada na tela de resultado
+  if (resultData.questionA || resultData.questionB) {
+    const questionsDiv = document.getElementById('result-questions');
+    const contentDiv = document.getElementById('result-questions-content');
+    contentDiv.innerHTML = `
+      <div class="result-question-row result-question-normal">
+        <span class="rq-label">Pergunta A (jogadores):</span>
+        <span class="rq-text">${resultData.questionA || '—'}</span>
+      </div>
+      <div class="result-question-row result-question-impostor">
+        <span class="rq-label">Pergunta B (impostor):</span>
+        <span class="rq-text">${resultData.questionB || '—'}</span>
+      </div>
+    `;
+    questionsDiv.classList.remove('hidden');
+  }
 
   const votesList = document.getElementById('votes-list');
   votesList.innerHTML = '';
@@ -359,6 +353,10 @@ function showDiscussionPhase() {
 }
 
 function displayAllAnswers(answers, questionA, questionB) {
+  // Salvar as perguntas no estado para uso posterior
+  state.questionA = questionA;
+  state.questionB = questionB;
+
   const masterList = document.getElementById('revealed-answers-list');
   const playerList = document.getElementById('player-answers-list');
   
@@ -374,7 +372,23 @@ function displayAllAnswers(answers, questionA, questionB) {
     playerList.appendChild(answerDiv);
   });
 
-  // Mostrar a pergunta do jogador na fase de discussão
+  // FIX: mostrar as perguntas para o mestre na fase de discussão
+  if (state.isMaster && (questionA || questionB)) {
+    const reminderDiv = document.getElementById('master-questions-reminder');
+    reminderDiv.innerHTML = `
+      <div class="master-q-row master-q-normal">
+        <span class="q-label">Pergunta A (jogadores):</span>
+        <span class="q-text">${questionA || '—'}</span>
+      </div>
+      <div class="master-q-row master-q-impostor">
+        <span class="q-label">Pergunta B (impostor):</span>
+        <span class="q-text">${questionB || '—'}</span>
+      </div>
+    `;
+    reminderDiv.classList.remove('hidden');
+  }
+
+  // FIX: mostrar a pergunta do jogador na fase de discussão
   if (!state.isMaster && state.myQuestion) {
     const playerPhase2 = document.getElementById('player-phase2');
 
@@ -402,7 +416,7 @@ function displayAllAnswers(answers, questionA, questionB) {
       `;
       playerPhase2.insertBefore(impostorBlock, playerPhase2.firstChild);
     } else {
-      // Jogador normal: lembrete simples da pergunta
+      // FIX: Jogador normal: lembrete simples da sua pergunta
       const reminderBlock = document.createElement('div');
       reminderBlock.className = 'my-question-reminder normal-reminder';
       reminderBlock.innerHTML = `
@@ -481,6 +495,8 @@ function resetToLobby() {
   state.currentPhase = null;
   state.isImpostor = false;
   state.myQuestion = null;
+  state.questionA = null;
+  state.questionB = null;
 
   // Resetar fases do mestre
   document.getElementById('master-phase1').classList.remove('hidden');
@@ -495,6 +511,10 @@ function resetToLobby() {
   document.getElementById('question-a').value = '';
   document.getElementById('question-b').value = '';
   document.getElementById('impostor-select').value = '';
+  // FIX: limpar lembrete de perguntas do mestre
+  const masterReminder = document.getElementById('master-questions-reminder');
+  masterReminder.innerHTML = '';
+  masterReminder.classList.add('hidden');
 
   // Resetar fases do jogador
   document.getElementById('player-phase1').classList.remove('hidden');
@@ -509,15 +529,15 @@ function resetToLobby() {
   document.getElementById('vote-submitted').classList.add('hidden');
   document.getElementById('voting-list').classList.remove('hidden');
 
-  // Limpar listas de respostas e blocos de lembrete de pergunta
+  // FIX: limpar listas de respostas e blocos de lembrete de pergunta
   document.getElementById('player-answers-list').innerHTML = '';
   document.getElementById('revealed-answers-list').innerHTML = '';
   const reminder = document.querySelector('.my-question-reminder');
   if (reminder) reminder.remove();
 
-  // Limpar caixa de perguntas da tela de resultado
-  const existingQBox = document.getElementById('result-questions-box');
-  if (existingQBox) existingQBox.remove();
+  // FIX: limpar seção de perguntas da tela de resultado
+  document.getElementById('result-questions').classList.add('hidden');
+  document.getElementById('result-questions-content').innerHTML = '';
 
   showLobby();
 }
